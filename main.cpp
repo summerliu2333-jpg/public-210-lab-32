@@ -20,10 +20,46 @@ int main() {
 
     cout << "Initial queue:" << endl;
     for (auto& car : tollLane) {
+        cout << "    ";
         car.print();
         cout << endl;
     }
     cout << endl;
+
+    int timeStep = 1;
+
+    while (!tollLane.empty()) {
+        double r = (double)rand() / RAND_MAX;
+
+        cout << "Time: " << timeStep << " Operation: ";
+
+        if (r < LEAVE_PROB) {
+            Car paidCar = tollLane.front();
+            tollLane.pop_front();
+            cout << "Car paid: ";
+            paidCar.print();
+        }
+        else {
+            Car newCar;
+            tollLane.push_back(newCar);
+            cout << "Joined lane: ";
+            newCar.print();
+        }
+
+        cout << "\nQueue:\n";
+        if (tollLane.empty()) {
+            cout << "    Empty\n";
+        } else {
+            for (auto& car : tollLane) {
+                cout << "    ";
+                car.print();
+                cout << endl;
+            }
+        }
+        cout << endl;
+
+        timeStep++;
+    }
 
     return 0;
 }
