@@ -40,23 +40,49 @@ int main() {
     for (int time = 1; time <= SIM_TIME; time++) {
         cout << "Time: " << time << endl;
 
+        vector<Car> switchCar(NUM_LANES);
+        vector<int> fromLane(NUM_LANES, -1);
+
         for (int i = 0; i < NUM_LANES; i++) {
             auto& lane = lanes[i];
 
             if (lane.empty()) {
                 if (rand() % 2 == 0) {
-                    lane.push_back(Car());
-                    cout << "Lane " << i+1 << " Joined (empty lane)\n";
+                    Car c;
+                    lane.push_back(c);
+                    cout << "Lane " << i+1 << " Joined: "; c.print(); cout << endl;
                 }
-            } else {
-                double r = (double)rand() / RAND_MAX;
-                if (r < 0.5) {
-                    lane.pop_front();
-                    cout << "Lane " << i+1 << " Paid\n";
-                } else {
-                    lane.push_back(Car());
-                    cout << "Lane " << i+1 << " Joined\n";
-                }
+                continue;
+            }
+
+            double r = (double)rand() / RAND_MAX;
+
+            if (r < LEAVE_PROB) {
+                Car c = lane.front();
+                lane.pop_front();
+                cout << "Lane " << i+1 << " Paid: "; c.print(); cout << endl;
+            }
+            else if (r < LEAVE_PROB + JOIN_PROB) {
+                Car c;
+                lane.push_back(c);
+                cout << "Lane " << i+1 << " Joined: "; c.print(); cout << endl;
+            }
+            else {
+                Car c = lane.back();
+                lane.pop_back();
+                switchCar[i] = c;
+                fromLane[i] = i;
+                cout << "Lane " << i+1 << " Switched: "; c.print(); cout << endl;
+            }
+        }
+
+        for (int i = 0; i < NUM_LANES; i++) {
+            if (fromLane[i] != -1) {
+                int target;
+                do {
+                    target = rand() % NUM_LANES;
+                } while (target == fromLane[i]);
+                lanes[target].push_back(switchCar[i]);
             }
         }
 
@@ -67,6 +93,6 @@ int main() {
         }
         cout << endl;
     }
-
+    
     return 0;
 }
